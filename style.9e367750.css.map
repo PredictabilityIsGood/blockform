@@ -1,0 +1,1 @@
+{"version":3,"sources":["style.css"],"names":[],"mappings":"AAAA,KACI,QAAQ,CACR,SACJ,CACA,OACI,UACJ,CACA,OACI,WACJ","file":"style.9e367750.css","sourceRoot":"..","sourcesContent":["body{\r\n    margin:0;\r\n    padding:0;\r\n}\r\n.w-100{\r\n    width:100%;\r\n}\r\n.h-100{\r\n    height:100%;\r\n}"]}

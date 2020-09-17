@@ -1,0 +1,53 @@
+<component-branch>
+    <div 
+        key={ element.id } 
+        is={ element.template }
+        each={ element in state.elementChildren } 
+        elementTemplates={ state.elementTemplates }
+        elementChildren={ element.children }
+        isRoot= { false }
+        {...element.properties}>
+        </div>
+    <style>
+        .highlighted {
+            border:2px dashed red;
+        }
+    </style>
+    <script>
+        import { register,unregister,mount,unmount } from 'riot';
+        import { compile } from '@riotjs/compiler';
+        export default {
+            state:{
+                elementTemplates:{},
+                elementChildren:[],
+                isRoot:1
+            },
+            onBeforeMount(props,state){
+                this.state.elementTemplates = props.elementTemplates || this.state.elementTemplates;
+                this.state.elementChildren = props.elementChildren || this.state.elementChildren;
+                this.state.isRoot = props.isRoot !== undefined ? props.isRoot : true;
+                if(this.state.isRoot){
+                    Object.entries(this.state.elementTemplates).forEach((entry,index)=>{
+                        let wrappedUncompiled = this.wrapParent(entry[0],entry[1]);
+                        let compiled = compile(wrappedUncompiled);
+                        register(entry[0],new Function(' return '+compiled.code.replace("export default ",""))());
+                    });
+                }
+            },
+            onBeforeUpdate(props,state){
+                this.state.elementTemplates = props.elementTemplates || this.state.elementTemplates;
+                this.state.elementChildren = props.elementChildren || this.state.elementChildren;
+            },
+            onUnmount(props,state){
+                if(this.state.isRoot){
+                    Object.entries(this.state.elementTemplates).forEach((entry,index)=>{
+                        unregister(entry[0]);
+                    });
+                }
+            },
+            wrapParent(component,entry){
+                return entry.wrap ? `<${component}>${entry.HTML}</${component}>` : entry.HTML ;
+            }
+        }
+    </script>
+</component-branch>

@@ -1,0 +1,203 @@
+<component-menu-branch>
+    <ul if={state.path.length===0}>
+        <li>
+            <div class="add-template-wrapper">
+                <button if={state.handlers.add !== null} class="button button-clear add-template-button" onclick={()=>toggleAdd(-1)}>
+                    add to root
+                </button>
+                <span class="add-template-menu" if={state.adding===-1} >
+                    <select placeholder="select a template" onchange={(e)=>selectTemplate(e.target.value)}>
+                        <option each={entry in Object.entries(state.elementTemplates)} value={entry[0]}>{entry[0].replace("blockform_","")}</option>
+                    </select>
+                    <button class="button button-outline" onclick={()=>addTemplateToRoot()}>+</button>
+                </span>
+            </div>
+        </li>
+    </ul>
+    <ul if={state.elementChildren.length > 0}>
+        <li key={element.id+"-menu-branch"} 
+            each={ (element,index) in state.elementChildren } 
+            
+            style={state.move.target && state.move.target.join("-") === state.path.concat([index]).join("-") ? "opacity:.8" : ""}>
+            <button class={state.handlers.modify !== null ? "button" : ""}
+                onclick={()=>toggleProperties(element,index)}>
+                {element.id + " - " + element.template.replace("blockform_","")}</button>
+            <div class="add-template-wrapper">
+                <button if={state.handlers.add !== null} class="button button-clear add-template-button" onclick={()=>toggleAdd(index)}>
+                    add
+                </button>
+                <span class="add-template-menu" if={state.adding===index} >
+                    <select placeholder="select a template" onchange={(e)=>selectTemplate(e.target.value)}>
+                        <option each={entry in Object.entries(state.elementTemplates)} value={entry[0]}>{entry[0].replace("blockform_","")}</option>
+                    </select>
+                    <button class="button button-outline" onclick={()=>addTemplate(index)}>+</button>
+                </span>
+            </div>
+            <button if={state.handlers.remove !== null} class="button button-clear" onclick={(e)=>removeTemplate(index)}>delete</button>
+            <button if={state.move.target===null} class="button button-clear move-template-wrapper" onmousedown={()=>startMove(index)}>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-move"><polyline points="5 9 2 12 5 15"></polyline><polyline points="9 5 12 2 15 5"></polyline><polyline points="15 19 12 22 9 19"></polyline><polyline points="19 9 22 12 19 15"></polyline><line x1="2" y1="12" x2="22" y2="12"></line><line x1="12" y1="2" x2="12" y2="22"></line></svg> 
+            </button>
+            <button if={state.move.target!==null} class="button button-clear rotate-180" onmouseup={(e)=>endMoveSiblingBefore(index)}>
+                <svg style="margin-bottom:-7px;" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-download"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            </button>
+            <button if={state.move.target!==null} class="button button-clear" onmouseup={(e)=>endMoveSiblingAfter(index)}>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-download"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            </button>
+            <button if={state.move.target!==null} class="button button-clear" onmouseup={(e)=>endMoveChild(index)}>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-corner-right-down"><polyline points="10 15 15 20 20 15"></polyline><path d="M4 4h7a4 4 0 0 1 4 4v12"></path></svg>
+            </button>
+            
+            <component-properties if={element.properties.show} 
+                handlers={state.handlers}
+                path={state.path.concat([index,"properties"])}
+                data={element}></component-properties>
+            <component-menu-branch key={state.path.concat([index,"children"]).join("-")} {...childState(element,index)}></component-menu-branch>
+        </li>
+    </ul>
+    <style>
+        component-menu-branch button {
+            cursor:default;
+            padding:0 2rem !important;
+            margin-bottom:0 !important;
+        }
+        component-menu-branch ul {
+            list-style:none;
+        }
+        component-menu-branch .add-template-menu {
+            background-color:white;
+            margin:0;
+            display:inline;
+        }
+        component-menu-branch .add-template-button {
+            position:relative;
+        }
+        component-menu-branch .add-template-wrapper {
+            position:relative;
+            display:inline;
+        }
+        component-menu-branch .add-template-wrapper select {
+            max-width:200px;
+            margin-right:1rem;
+        }
+        component-menu-branch .move-template-wrapper {
+            cursor:move;
+        }
+        component-menu-branch .rotate-180 {
+            transform:rotate(180deg);
+        }
+        component-menu-branch {
+            -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Old versions of Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Edge, Opera and Firefox */
+        }
+    </style>
+    <script>
+    export default {
+        state:{
+            elementTemplates:{},
+            elementChildren:[],
+            path:[],
+            handlers: {
+                add:null,
+                remove:null,
+                modify:null,
+                startMove:null,
+                endMove:null
+            },
+            move:{
+                target:null,
+                destination:null,
+            },
+            adding:-2,
+            template:""
+        },
+        onBeforeMount(props){
+            this.state.elementTemplates = props.elementTemplates || this.state.elementTemplates;
+            this.state.elementChildren = props.elementChildren || this.state.elementChildren;
+            this.state.path = props.path || this.state.path;
+            this.state.handlers.add = props.handlers && props.handlers.add ? props.handlers.add : this.state.handlers.add;
+            this.state.handlers.remove = props.handlers && props.handlers.remove ? props.handlers.remove : this.state.handlers.remove;
+            this.state.handlers.modify = props.handlers && props.handlers.modify ? props.handlers.modify : this.state.handlers.modify;
+            this.state.handlers.startMove = props.handlers && props.handlers.startMove ? props.handlers.startMove :this.state.handlers.startMove;
+            this.state.handlers.endMove = props.handlers && props.handlers.endMove ? props.handlers.endMove :this.state.handlers.endMove;
+            this.state.move.target = props.move && props.move.target !== undefined ? props.move.target : this.state.move.target;
+            this.state.move.destination = props.move && props.move.destination !== undefined ? props.move.destination : this.state.move.destination;
+        },
+        onBeforeUpdate(props){
+            this.state.elementTemplates = props.elementTemplates || this.state.elementTemplates;
+            this.state.elementChildren = props.elementChildren || this.state.elementChildren;
+            this.state.path = props.path || this.state.path;
+            this.state.move.target = props.move && props.move.target !== undefined ? props.move.target : this.state.move.target;
+            this.state.move.destination = props.move && props.move.destination !== undefined ? props.move.destination : this.state.move.destination;
+        },
+        childState(element,index){
+            return {
+                elementTemplates:this.state.elementTemplates,
+                elementChildren:element.children,
+                move:this.state.move,
+                path:this.state.path.concat([index,"children"]),
+                handlers:this.state.handlers
+            };
+        },
+        toggleAdd(index){
+            if(this.state.adding===index){
+                this.state.adding = -2;
+            }
+            else{
+                this.state.adding=index;
+            }
+            this.state.template=Object.keys(this.state.elementTemplates)[0];
+            this.update();
+        },
+        selectTemplate(template){
+            this.state.template=template;
+            this.update();
+        },
+        addTemplate(index){
+            const newTemplate = this.state.template+"";
+            this.state.handlers.add(this.state.path.concat([index,"children"]),newTemplate);
+            this.state.template = "";
+            this.state.adding = -2;
+            this.update();
+        },
+        addTemplateToRoot(){
+            const newTemplate = this.state.template+"";
+            this.state.handlers.add([],newTemplate);
+            this.state.template = "";
+            this.state.adding = -2;
+            this.update();
+        },
+        removeTemplate(index){
+            this.state.handlers.remove(this.state.path.concat([index]));
+            this.update();
+        },
+        startMove(index){
+            this.state.handlers.startMove(this.state.path.concat([index]));
+        },
+        endMoveSiblingBefore(index){
+            this.state.handlers.endMove(this.state.path.concat([index]));
+        },
+        endMoveSiblingAfter(index){
+            this.state.handlers.endMove(this.state.path.concat([index+1]));
+        },
+        endMoveChild(index){
+            this.state.handlers.endMove(this.state.path.concat([index,"children",0]));
+        },
+        toggleProperties(element,index){
+            const newProperties = { 
+                ...element.properties,
+                show:(element.properties.show === undefined ? true : !element.properties.show) 
+            };
+            this.state.handlers.modify(
+                this.state.path.concat([index,"properties"]),
+                newProperties
+            )
+        },
+        
+    }
+    </script>
+</component-menu-branch>

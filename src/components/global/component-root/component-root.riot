@@ -1,0 +1,203 @@
+<component-root class="w-100 h-100">
+  <div class="container">
+    <div class="row" style="margin-top:1.5em;">
+        <div class="column column-30">
+            <h2>blockform</h2>
+        </div>
+        <div class="column column-30">
+        </div>
+        <div class="column column-40" style="text-align:right;">
+            <a class="button" target="_blank" href="https://github.com/PredictabilityIsGood/blockform">git</a>
+        </div>
+    </div>
+  </div>
+  <hr style="margin:0;">
+  <main is="component-branch" {...state.proxy}></main>
+  <hr>
+  <nav id="blockform_editor" class="container" 
+        onmouseup={(e)=>resetMoveLayoutItem()} 
+        onmouseout={(e)=>componentResetMoveLayoutItem(e)}
+        oncontextmenu={(e)=>resetMoveLayoutItem()}>
+    <table>
+        <thead>
+            <tr>
+                <th>Designer 
+                    <span style="float:right;">
+                        <input type="text" placeholder="enter form name" style="width:220px;margin:0 auto;margin-right:1em;" onchange={(e)=>updateFormName(e.target.value)} value={state.name}/>
+                        <button class="button" style="margin:0 auto;margin-right:1em;" onclick={exportHTML}>Export HTML</button>
+                        <button class="button" style="margin:0 auto;" onclick={exportJSON}>Export JSON</button>
+                    </span>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="position:relative;">
+                    <component-menu-branch {...state.proxy} class="w-100"></component-menu-branch>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+  </nav>
+  <style>
+    component-menu-branch ul {
+        margin-top:.1rem;
+        margin-bottom:.1rem;
+    }
+    component-menu-branch li {
+        margin-bottom:.1rem;
+    }
+  </style>
+  <script>
+    const grul = require("grul");
+    export default {
+        state:{
+            name:"",
+            proxy:{},
+            
+        },
+        onBeforeMount(props){
+            let proxied = props ? { ...props } : { ...this.state.proxy };
+            delete proxied.is;
+            grul.atPattern(proxied.elementChildren,["properties"],{"head":(element)=>{
+                element.properties = proxied.elementTemplates[element.template].defaults ? {
+                        ...proxied.elementTemplates[element.template].defaults,
+                        ...element.properties
+                    } : element.properties;
+            }},-1)
+            this.state.proxy = proxied || this.state.proxy;
+            this.state.proxy.handlers = {
+                add:this.addLayoutItem.bind(this),
+                remove:this.removeLayoutItem.bind(this),
+                modify:this.modifyLayoutItem.bind(this),
+                startMove:this.startMoveLayoutItem.bind(this),
+                endMove:this.endMoveLayoutItem.bind(this)
+            };
+            this.state.proxy.move = {
+                target:null,
+                destination:null
+            };
+        },
+        addLayoutItem(path,type){
+            let max = 0;
+            grul.atPattern(this.state.proxy.elementChildren,["id"],{
+                head:(data,htp,hlp)=>{
+                    max = data > max ? data : max;
+                }
+            });
+            grul.pluck(this.state.proxy.elementChildren,path).push({
+                properties:{ ...this.state.proxy.elementTemplates[type].defaults },
+                template:type,
+                children:[],
+                id:max+1
+            });
+            this.update();
+        },
+        removeLayoutItem(path){
+            grul.pluck(this.state.proxy.elementChildren,path.slice(0,-1)).splice(path.slice(-1),1)
+            this.update();
+        },
+        modifyLayoutItem(path,properties){
+            grul.atPattern(this.state.proxy.elementChildren,["properties","show"],(data,htp,hlp)=>{
+                grul.pluck(this.state.proxy.elementChildren,hlp,false); 
+            });
+            grul.pluck(this.state.proxy.elementChildren,path,properties) 
+            this.update();
+        },
+        startMoveLayoutItem(path){
+            this.state.proxy.move.target=path;
+            this.update();
+        },
+        endMoveLayoutItem(path){
+            if( this.state.proxy.move.target === null || 
+                path === null || 
+                (path.join("-").indexOf(this.state.proxy.move.target.join("-"))===0 )){}
+            else if(this.state.proxy.move.target !== null){
+                this.state.proxy.move.destination=path;
+                const startIndex = this.state.proxy.move.target.slice(-1)[0];
+                const endIndex = this.state.proxy.move.destination.slice(-1)[0];
+                const startElementContainer = grul.pluck(this.state.proxy.elementChildren,this.state.proxy.move.target.slice(0,-1));
+                const endElementContainer = grul.pluck(this.state.proxy.elementChildren,this.state.proxy.move.destination.slice(0,-1));
+                endElementContainer.splice(endIndex,0,
+                    startElementContainer[startIndex]
+                );
+                if(startElementContainer===endElementContainer){
+                    endIndex > startIndex ? startElementContainer.splice(startIndex,1) : startElementContainer.splice(startIndex+1,1);
+                } 
+                else{
+                    startElementContainer.splice(startIndex,1);
+                }
+            }
+        },
+        resetMoveLayoutItem(){
+            this.state.proxy.move.target=null;
+            this.state.proxy.move.destination=null;            
+            this.update();
+        },
+        componentResetMoveLayoutItem(e){
+            if(e.fromElement.id=="blockform_editor"){
+                this.resetMoveLayoutItem();
+            }
+        },
+        updateFormName(name){
+            this.state.name=name;
+            this.update();
+        },
+        exportJSON(){
+            const filename = (this.state.name === "" ? "blockform_export_" + new Date().toISOString() : this.state.name);
+            this.download(filename+".json",JSON.stringify(this.state.proxy.elementChildren));
+        },
+        exportHTML(){
+            const htmlname =(this.state.name === "" ? "blockform" : this.state.name)
+            const filename = (this.state.name === "" ? "blockform_export_" + new Date().toISOString() : this.state.name);
+            const styles = document.querySelector("head").querySelector("style").innerHTML;
+            const head = `
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>${htmlname}</title>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.4.0/milligram.css">
+        <style>${styles}</style>
+    </head>`
+            const form = this.formatHTML(this.$("main").innerHTML);
+            const body = `
+    <body>${form}
+    </body>`;
+            const html = `<!DOCTYPE html>
+<html lang="en">` + head + body + `
+</html>`;   
+            this.download(filename+".html",html);
+        },
+        formatHTML(string){
+            let curDepth=1;
+            let strParts = []
+            for(let i=0;i<string.length;i++){
+                 if(string.slice(i,i+2)==='</'){
+                    curDepth-=1;
+                    strParts.push('\r\n'+'\t'.repeat(curDepth))
+                }
+                else if(string.charAt(i)==='<' && string.slice(i).indexOf("<input")!==0){
+                    strParts.push('\r\n'+'\t'.repeat(curDepth))
+                    curDepth+=1;
+                }
+                strParts.push(string.charAt(i));
+            }
+            return strParts.join('');
+        },
+        download(filename, text) {
+            var element = document.createElement('a');
+            element.setAttribute('href', 'data:html/plain;charset=utf-8,' + encodeURIComponent(text));
+            element.setAttribute('download', filename);
+
+            element.style.display = 'none';
+            document.body.appendChild(element);
+
+            element.click();
+
+            document.body.removeChild(element);
+        }
+    }
+  </script>
+</component-root>

@@ -1,0 +1,91 @@
+<component-properties>
+    <div class="row">
+        <div class="column">
+            <div class="row">
+                <h5 class="panel-header w-100">
+                    <span>{state.template.replace("blockform_","")} #{state.id}</span>
+                    <button 
+                        class="button button-clear float-right" 
+                        onclick={()=>state.handlers.modify(state.path,{...state.fields,show:false})}>x</button>
+                </h5>
+            </div>
+        </div>
+    </div>
+    <dl>
+        <dt key={state.path.join("-")+"-"+index} each="(entry,index) in Object.entries(state.fields)">
+            <label for={entry[0]+"-"+index}>{entry[0].replace("blockform_","")}</label>
+            <input 
+                id={entry[0]+"-"+index} 
+                type={getType(entry[1])} 
+                value={entry[1]}
+                checked={entry[1]}
+                placeholder={"enter a " + entry[0]}
+                onchange={(e)=>modifyProperties(entry[0],getType(entry[1]) === "checkbox" ? e.target.checked : e.target.value)}/>
+        </dt>
+    </dl>
+    <style>
+    component-properties {
+        background-color:white;
+        /*box-shadow:1px 2px 3px gray;*/
+        border-left:5px solid lightgray;
+        padding:2rem;
+        position:absolute;
+        right:0;top:0;
+        z-index:99999;
+        min-width:250px;
+        max-height:100%;
+        overflow-y:auto;
+    }
+    component-properties dl,
+    component-properties dt {
+        margin: 0;
+    }
+    component-properties .panel-header {
+        border-bottom:1px solid lightgray;
+    }
+    </style>
+    <script>
+    export default  {
+        state:{
+            id:-1,
+            template:"Test",
+            fields:{
+                test:"property"
+            },
+            handlers:{
+                modify:null
+            },
+            path:[]
+        },
+        onBeforeMount(props,state){
+            this.state.id = props.data && props.data.id;
+            this.state.template = props.data && props.data.template;
+            this.state.fields = props.data && props.data.properties ? {
+                ...props.data.properties
+            } : this.state.fields;
+            this.state.path = props.path ? props.path : this.state.path;
+            this.state.handlers.modify = props.handlers && props.handlers.modify ?
+                props.handlers.modify :
+                this.state.handlers.modify;
+        },
+        getType(value){
+            if(value.constructor===String){
+                return "text"
+            }
+            else if(value.constructor===Number){
+                return "number"
+            }
+            else if(value.constructor===Boolean){
+                return "checkbox"
+            }
+        },
+        modifyProperties(key,value){
+            this.state.fields[key] = value;
+            this.state.handlers.modify(
+                this.state.path,
+                this.state.fields
+            )
+        }
+    }
+    </script>
+</component-properties>

@@ -55,7 +55,6 @@ npm-debug.log
 .cache/
 coverage
 generated
-/dist
 
 # these files are generated anyway
 .nycrc

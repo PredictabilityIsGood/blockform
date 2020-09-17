@@ -1,6 +1,6 @@
 # blockform
 
-Drag &amp; drop HTML form building tool
+Plug & Play HTML Form Generator with native riot module integration
 
 ## Start
 

@@ -78,7 +78,7 @@
                 this.state.handlers.modifyTemplate = props.handlers && props.handlers.modifyTemplate  ? props.handlers.modifyTemplate : this.state.handlers.modifyTemplate; 
             },
             onMounted(props,state){
-                ace.config.set("basePath","http://ajaxorg.github.io/ace-builds/src-min-noconflict/")
+                ace.config.set("basePath","https://ajaxorg.github.io/ace-builds/src-min-noconflict/")
                 ace.require("ace/ext/language_tools")
                 var editor = ace.edit("editor",{
                     printMargin:false,

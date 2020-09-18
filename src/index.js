@@ -70,93 +70,93 @@ mount('[data-riot-component]',{
     elementTemplates:{
         container:{
             HTML:`<container class="container">
-                <template is="component-branch" {...state.properties}></template>
-                <script>  
-                    export default { 
-                        state:{ 
-                            properties:{} 
-                        },
-                        onBeforeMount(props){
-                            this.state.properties=props || this.state.properties;
-                        }
-                    } 
-                </script>
-            </container>`,
+    <template is="component-branch" {...state.properties}></template>
+    <script>  
+        export default { 
+            state:{ 
+                properties:{} 
+            },
+            onBeforeMount(props){
+                this.state.properties=props || this.state.properties;
+            }
+        } 
+    </script>
+</container>`,
             wrap:false
         },
         row:{
             HTML:`<row class="row">
-                <template is="component-branch" {...state.properties}></template>
-                <script>  
-                    export default { 
-                        state:{ 
-                            properties:{} 
-                        },
-                        onBeforeMount(props){
-                            this.state.properties=props || this.state.properties;
-                        }
-                    } 
-                </script>
-            </row>`,
+    <template is="component-branch" {...state.properties}></template>
+    <script>  
+        export default { 
+            state:{ 
+                properties:{} 
+            },
+            onBeforeMount(props){
+                this.state.properties=props || this.state.properties;
+            }
+        } 
+    </script>
+</row>`,
             wrap:false
         },
         column:{
             HTML:`<column class="column">
-                <template is="component-branch" {...state.properties}></template>
-                <script>  
-                    export default { 
-                        state:{ 
-                            properties:{} 
-                        },
-                        onBeforeMount(props){
-                            this.state.properties=props || this.state.properties;
-                        }
-                    } 
-                </script>
-            </column>`,
+    <template is="component-branch" {...state.properties}></template>
+    <script>  
+        export default { 
+            state:{ 
+                properties:{} 
+            },
+            onBeforeMount(props){
+                this.state.properties=props || this.state.properties;
+            }
+        } 
+    </script>
+</column>`,
             wrap:false
         },
-        label:{
+        blockform_label:{
             HTML:`<label>
-                {props.text}
-                <script>  
-                    export default { 
-                        state:{ 
-                            properties:{} 
-                        },
-                        onBeforeMount(props){
-                            this.state.properties=props || this.state.properties;
-                        }
-                    } 
-                </script>
-            </label>`,
-            wrap:false,
+    {props.text}
+    <script>  
+        export default { 
+            state:{ 
+                properties:{} 
+            },
+            onBeforeMount(props){
+                this.state.properties=props || this.state.properties;
+            }
+        } 
+    </script>
+</label>`,
+            wrap:true,
             defaults:{
                 text:"Example Label"
             }
         },
         blockform_form:{
             HTML:`<blockform_form class="w-100">
-            <form { ...state.properties }>
-                <template is="component-branch" {...state.properties}></template>
-            </form>
-            <script>  
-                export default { 
-                    state:{ 
-                        properties:{} 
-                    },
-                    onBeforeMount(props){
-                        this.state.properties=props || this.state.properties;
-                    },
-                    onBeforeUpdate(props){
-                        this.state.properties=props || this.state.properties;
-                    },
-                    onMounted(){
-                        this.update();
-                    }
-                } 
-            </script>
-            </blockform_form>`,
+    <form { ...state.properties }>
+        <template is="component-branch" {...state.properties}></template>
+    </form>
+    <script>  
+        export default { 
+            state:{ 
+                properties:{} 
+            },
+            onBeforeMount(props){
+                this.state.properties=props || this.state.properties;
+            },
+            onBeforeUpdate(props){
+                this.state.properties=props || this.state.properties;
+            },
+            onMounted(){
+                this.update();
+            }
+        } 
+    </script>
+</blockform_form>`,
             wrap:false,
             defaults:{
                 name:"",
@@ -164,23 +164,23 @@ mount('[data-riot-component]',{
             }
         },
         blockform_input:{
-            HTML:`<input { ...state.properties } />
-            <script>  
-                export default { 
-                    state:{ 
-                        properties:{} 
-                    },
-                    onBeforeMount(props){
-                        this.state.properties=props || this.state.properties;
-                    },
-                    onBeforeUpdate(props){
-                        this.state.properties=props || this.state.properties;
-                    },
-                    onMounted(){
-                        this.update();
-                    }
-                } 
-            </script>`,
+            HTML:`  <input { ...state.properties } />
+    <script>  
+        export default { 
+            state:{ 
+                properties:{} 
+            },
+            onBeforeMount(props){
+                this.state.properties=props || this.state.properties;
+            },
+            onBeforeUpdate(props){
+                this.state.properties=props || this.state.properties;
+            },
+            onMounted(){
+                this.update();
+            }
+        } 
+    </script>`,
             wrap:true,
             defaults:{
                 name:"my-input",
@@ -193,32 +193,32 @@ mount('[data-riot-component]',{
             }
         },
         blockform_select:{
-            HTML:`<select {...state.properties} is="blockform_option">
-            </select>
-            <script>  
-                export default { 
-                    state:{ 
-                        properties:{} 
-                    },
-                    onBeforeMount(props){
-                        this.state.properties=props || this.state.properties;
-                    },
-                    onBeforeUpdate(props){
-                        this.state.properties=props || this.state.properties;
-                        this.$('select').querySelectorAll('option').forEach((option)=>{
-                            if(option.value===this.state.properties.value){
-                                option.setAttribute('selected',true);
-                            }
-                            else{
-                                option.removeAttribute('selected');
-                            }
-                        })
-                    },
-                    onMounted(){
-                        this.update();
+            HTML:`  <select {...state.properties} is="blockform_option">
+    </select>
+    <script>  
+        export default { 
+            state:{ 
+                properties:{} 
+            },
+            onBeforeMount(props){
+                this.state.properties=props || this.state.properties;
+            },
+            onBeforeUpdate(props){
+                this.state.properties=props || this.state.properties;
+                this.$('select').querySelectorAll('option').forEach((option)=>{
+                    if(option.value===this.state.properties.value){
+                        option.setAttribute('selected',true);
                     }
-                } 
-            </script>`,
+                    else{
+                        option.removeAttribute('selected');
+                    }
+                })
+            },
+            onMounted(){
+                this.update();
+            }
+        } 
+    </script>`,
             wrap:true,
             defaults:{
                 name:"my-select",
@@ -227,23 +227,23 @@ mount('[data-riot-component]',{
             }
         },
         blockform_submit:{
-            HTML:`<input class="button-primary" type="submit" { ...state.properties } />
-            <script>  
-                export default { 
-                    state:{ 
-                        properties:{} 
-                    },
-                    onBeforeMount(props){
-                        this.state.properties=props || this.state.properties;
-                    },
-                    onBeforeUpdate(props){
-                        this.state.properties=props || this.state.properties;
-                    },
-                    onMounted(){
-                        this.update();
-                    }
-                } 
-            </script>`,
+            HTML:`  <input class="button-primary" type="submit" { ...state.properties } />
+    <script>  
+        export default { 
+            state:{ 
+                properties:{} 
+            },
+            onBeforeMount(props){
+                this.state.properties=props || this.state.properties;
+            },
+            onBeforeUpdate(props){
+                this.state.properties=props || this.state.properties;
+            },
+            onMounted(){
+                this.update();
+            }
+        } 
+    </script>`,
             wrap:true,
             defaults:{
                 name:"my-input",
@@ -251,26 +251,25 @@ mount('[data-riot-component]',{
             }
         },
         blockform_option:{
-            HTML:`
-            <blockform_option>
-                <option each={ element in state.properties.elementChildren } {...element.properties}>{element.properties.description}</option>
-                <script>  
-                    export default { 
-                        state:{ 
-                            properties:{} 
-                        },
-                        onBeforeMount(props){
-                            this.state.properties=props || this.state.properties;
-                        },
-                        onBeforeUpdate(props){
-                            this.state.properties=props || this.state.properties;
-                        },
-                        onMounted(){
-                            this.update();
-                        }
-                    } 
-                </script>
-            </blockform_option>`,
+            HTML:`<blockform_option>
+    <option each={ element in state.properties.elementChildren } {...element.properties}>{element.properties.description}</option>
+    <script>  
+        export default { 
+            state:{ 
+                properties:{} 
+            },
+            onBeforeMount(props){
+                this.state.properties=props || this.state.properties;
+            },
+            onBeforeUpdate(props){
+                this.state.properties=props || this.state.properties;
+            },
+            onMounted(){
+                this.update();
+            }
+        } 
+    </script>
+</blockform_option>`,
             wrap:false,
             defaults:{
                 selected:false,
@@ -280,44 +279,44 @@ mount('[data-riot-component]',{
         },
         banner:{
             HTML:`<banner>
-                <div 
-                    class="banner" 
-                    style="background-image:url('{state.url}');height:{state.height};margin:{state.marginTop} {state.marginRight} {state.marginBottom} {state.marginLeft};">
-                </div>
-                <style>
-                    .banner{
-                        background-size:cover;
-                    }
-                </style>
-                <script>
-                    export default {
-                        state:{
-                            url:"",
-                            height:"",
-                            marginTop:"",
-                            marginBottom:"",
-                            marginLeft:"",
-                            marginRight:""
-                        },
-                        onBeforeMount(props){
-                            this.state.url=props.url || this.state.url;
-                            this.state.height=props.height || this.state.height;
-                            this.state.marginTop=props.marginTop || this.state.marginTop;
-                            this.state.marginBottom=props.marginBottom || this.state.marginBottom;
-                            this.state.marginLeft=props.marginLeft || this.state.marginLeft;
-                            this.state.marginRight=props.marginRight || this.state.marginRight;
-                        },
-                        onBeforeUpdate(props){
-                            this.state.url=props.url || this.state.url;
-                            this.state.height=props.height || this.state.height;
-                            this.state.marginTop=props.marginTop || this.state.marginTop;
-                            this.state.marginBottom=props.marginBottom || this.state.marginBottom;
-                            this.state.marginLeft=props.marginLeft || this.state.marginLeft;
-                            this.state.marginRight=props.marginRight || this.state.marginRight;
-                        }
-                    }
-                </script>
-            </banner>`,
+    <div 
+        class="banner" 
+        style="background-image:url('{state.url}');height:{state.height};margin:{state.marginTop} {state.marginRight} {state.marginBottom} {state.marginLeft};">
+    </div>
+    <style>
+        .banner{
+            background-size:cover;
+        }
+    </style>
+    <script>
+        export default {
+            state:{
+                url:"",
+                height:"",
+                marginTop:"",
+                marginBottom:"",
+                marginLeft:"",
+                marginRight:""
+            },
+            onBeforeMount(props){
+                this.state.url=props.url || this.state.url;
+                this.state.height=props.height || this.state.height;
+                this.state.marginTop=props.marginTop || this.state.marginTop;
+                this.state.marginBottom=props.marginBottom || this.state.marginBottom;
+                this.state.marginLeft=props.marginLeft || this.state.marginLeft;
+                this.state.marginRight=props.marginRight || this.state.marginRight;
+            },
+            onBeforeUpdate(props){
+                this.state.url=props.url || this.state.url;
+                this.state.height=props.height || this.state.height;
+                this.state.marginTop=props.marginTop || this.state.marginTop;
+                this.state.marginBottom=props.marginBottom || this.state.marginBottom;
+                this.state.marginLeft=props.marginLeft || this.state.marginLeft;
+                this.state.marginRight=props.marginRight || this.state.marginRight;
+            }
+        }
+    </script>
+</banner>`,
             wrap:false,
             defaults:{
                 url:"https://www.liu.edu/~/media/8D1A6B65E713440B8C6C08AAF5A7720C.ashx",

@@ -1,0 +1,114 @@
+<component-menu-block>
+    <div class="container" class="w-100">
+        <div class="row">
+            <div class="column">
+                <button class="button button-clear">
+                    Add
+                </button>
+                <button class="button button-clear">
+                    Delete
+                </button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="column column-20">
+                <label for="block-selection"> 
+                    Component Name
+                </label>
+                <select id="block-selection" value={state.template} onchange={(e)=>setTemplate(e.target.value)}>
+                    <option 
+                        key={entry[0]+"-block-component-name"} 
+                        each={entry in Object.entries(state.elementTemplates)} 
+                        value={entry[0]}>
+                        {entry[0].replace("blockform_","")}
+                    </option>
+                </select>
+            </div>
+            <div class="column column-10"></div>
+            <div class="column column-50">
+                <label>Component Options</label>
+                <label for="wrap-component">
+                    <input id="wrap-component" type="checkbox"
+                        checked={state.elementTemplates[state.template].wrap?true:false} 
+                        onchange={(e)=>setTemplateValue("wrap",e.target.checked)}/> Wrap <span 
+                                                    if={state.elementTemplates[state.template].wrap !== state.newElementTemplates[state.template].wrap} 
+                                                    style="color:firebrick;">*
+                                                </span>
+                </label>
+            </div>
+            <div class="column column-20" style="text-align:right;">
+                <label> </label>
+                <button class="button" onclick={(e)=>modifyTemplate()}>
+                    update
+                </button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="column">
+                <label for="editor">Module Code <span 
+                                                    if={state.elementTemplates[state.template].HTML !== state.newElementTemplates[state.template].HTML} 
+                                                    style="color:firebrick;">*
+                                                </span>
+                </label>
+                <div id="editor"></div>
+            </div>
+        </div>
+    </div>
+    <style>
+        #editor{
+            height:400px;
+        }
+    </style>
+    <script>
+        const ace = require("ace-builds/src-min-noconflict/ace");
+        const autocomplete_tools = require("ace-builds/src-min-noconflict/ext-language_tools");
+        export default {
+            state:{
+                elementTemplates:{},
+                template:"container",
+                newElementTemplates:{},
+                editor:null,
+                handlers:{
+                    modifyTemplate:null
+                }
+            },
+            onBeforeMount(props,state){
+                this.state.elementTemplates = props.elementTemplates || this.state.elementTemplates;
+                this.state.newElementTemplates = JSON.parse(JSON.stringify(props.elementTemplates)) || this.state.newElementTemplates;
+                this.state.handlers.modifyTemplate = props.handlers && props.handlers.modifyTemplate  ? props.handlers.modifyTemplate : this.state.handlers.modifyTemplate; 
+            },
+            onMounted(props,state){
+                ace.config.set("basePath","http://ajaxorg.github.io/ace-builds/src-min-noconflict/")
+                ace.require("ace/ext/language_tools")
+                var editor = ace.edit("editor",{
+                    printMargin:false,
+                    enableBasicAutocompletion: true,
+                    enableSnippets: true,
+                    enableLiveAutocompletion: true
+                });
+                editor.setTheme("ace/theme/tomorrow_night");
+                editor.session.setMode("ace/mode/html");
+                this.state.editor = editor;
+                this.state.editor.setValue(this.state.newElementTemplates[this.state.template].HTML);
+                this.state.editor.session.on('change', (delta)=> {
+                    this.state.newElementTemplates[this.state.template].HTML=editor.getValue();
+                });
+                this.update();
+            },
+            onBeforeUpdate(props,state){
+                this.state.elementTemplates = props.elementTemplates || this.state.elementTemplates;
+                this.state.editor.setValue(this.state.newElementTemplates[this.state.template].HTML);
+            },
+            setTemplate(template){
+                this.state.template=template;
+                this.update();
+            },
+            setTemplateValue(key,value){
+                this.state.newElementTemplates[this.state.template][key]=value;
+            },
+            modifyTemplate(){
+                this.state.handlers.modifyTemplate(this.state.template,this.state.newElementTemplates[this.state.template]);
+            }
+        }
+    </script>
+</component-menu-block>

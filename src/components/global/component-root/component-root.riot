@@ -12,7 +12,7 @@
     </div>
   </div>
   <hr style="margin:0;">
-  <main is="component-branch" {...state.proxy}></main>
+    <main></main>
   <hr>
   <nav id="blockform_editor" class="container" 
         onmouseup={(e)=>resetMoveLayoutItem()} 
@@ -21,7 +21,9 @@
     <table>
         <thead>
             <tr>
-                <th>Designer 
+                <th style="cursor:pointer;opacity:{state.mode==="block"?"1":".6"};" onclick={()=>changeMode('block')}>block</th>
+                <th style="cursor:pointer;opacity:{state.mode==="form"?"1":".6"};" onclick={()=>changeMode('form')}>form</th>
+                <th>
                     <span style="float:right;">
                         <input type="text" placeholder="enter form name" style="width:220px;margin:0 auto;margin-right:1em;" onchange={(e)=>updateFormName(e.target.value)} value={state.name}/>
                         <button class="button" style="margin:0 auto;margin-right:1em;" onclick={exportHTML}>Export HTML</button>
@@ -32,7 +34,10 @@
         </thead>
         <tbody>
             <tr>
-                <td style="position:relative;">
+                <td if={state.mode==="block"} style="position:relative;" colspan="3">
+                    <component-menu-block {...state.proxy} class="w-100"></component-menu-block>
+                </td>
+                <td if={state.mode==="form"} style="position:relative;" colspan="3">
                     <component-menu-branch {...state.proxy} class="w-100"></component-menu-branch>
                 </td>
             </tr>
@@ -50,11 +55,18 @@
   </style>
   <script>
     const grul = require("grul");
+    import { register,unregister,mount,unmount } from 'riot';
+    import { compile } from '@riotjs/compiler';
     export default {
         state:{
+            surrogate:0,
             name:"",
             proxy:{},
-            
+            mode:"form"
+        },
+        changeMode(name){
+            this.state.mode=name;
+            this.update();
         },
         onBeforeMount(props){
             let proxied = props ? { ...props } : { ...this.state.proxy };
@@ -71,12 +83,19 @@
                 remove:this.removeLayoutItem.bind(this),
                 modify:this.modifyLayoutItem.bind(this),
                 startMove:this.startMoveLayoutItem.bind(this),
-                endMove:this.endMoveLayoutItem.bind(this)
+                endMove:this.endMoveLayoutItem.bind(this),
+                modifyTemplate:this.modifyTemplate.bind(this)
             };
             this.state.proxy.move = {
                 target:null,
                 destination:null
             };
+            Object.entries(proxied.elementTemplates).forEach((entry,index)=>{
+                this.registerTemplate(entry[0],entry[1])
+            });
+        },
+        onMounted(props){
+            mount(`main`,this.state.proxy,'component-branch');
         },
         addLayoutItem(path,type){
             let max = 0;
@@ -130,14 +149,30 @@
             }
         },
         resetMoveLayoutItem(){
-            this.state.proxy.move.target=null;
-            this.state.proxy.move.destination=null;            
-            this.update();
+            if(this.state.proxy.move.target!==null){
+                this.state.proxy.move.target=null;
+                this.state.proxy.move.destination=null;            
+                this.update();
+            }
         },
         componentResetMoveLayoutItem(e){
-            if(e.fromElement.id=="blockform_editor"){
+            if(e.fromElement.id==="blockform_editor" && this.state.proxy.move.target !== null){
                 this.resetMoveLayoutItem();
             }
+        },
+        modifyTemplate(name,template){
+            this.state.proxy.elementTemplates[name]=template;
+            unmount(`main`,true);
+            unregister(name);
+            this.registerTemplate(name,template);
+            mount(`main`,this.state.proxy,'component-branch');
+            this.update();
+            
+        },
+        registerTemplate(name,template){
+            let wrappedUncompiled = this.wrapParent(name,template);
+            let compiled = compile(wrappedUncompiled);
+            register(name,new Function(' return '+compiled.code.replace("export default ",""))());
         },
         updateFormName(name){
             this.state.name=name;
@@ -197,6 +232,9 @@
             element.click();
 
             document.body.removeChild(element);
+        },
+        wrapParent(component,entry){
+            return entry.wrap ? `<${component}>${entry.HTML}</${component}>` : entry.HTML ;
         }
     }
   </script>

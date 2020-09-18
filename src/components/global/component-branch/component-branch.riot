@@ -26,13 +26,6 @@
                 this.state.elementTemplates = props.elementTemplates || this.state.elementTemplates;
                 this.state.elementChildren = props.elementChildren || this.state.elementChildren;
                 this.state.isRoot = props.isRoot !== undefined ? props.isRoot : true;
-                if(this.state.isRoot){
-                    Object.entries(this.state.elementTemplates).forEach((entry,index)=>{
-                        let wrappedUncompiled = this.wrapParent(entry[0],entry[1]);
-                        let compiled = compile(wrappedUncompiled);
-                        register(entry[0],new Function(' return '+compiled.code.replace("export default ",""))());
-                    });
-                }
             },
             onBeforeUpdate(props,state){
                 this.state.elementTemplates = props.elementTemplates || this.state.elementTemplates;
@@ -44,9 +37,6 @@
                         unregister(entry[0]);
                     });
                 }
-            },
-            wrapParent(component,entry){
-                return entry.wrap ? `<${component}>${entry.HTML}</${component}>` : entry.HTML ;
             }
         }
     </script>

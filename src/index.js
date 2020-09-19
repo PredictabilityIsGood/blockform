@@ -252,7 +252,7 @@ mount('[data-riot-component]',{
         },
         blockform_option:{
             HTML:`<blockform_option>
-    <option each={ element in state.properties.elementChildren } {...element.properties}>{element.properties.description}</option>
+    <option key={element.id} each={ element in state.properties.elementChildren } {...element.properties}>{element.properties.description}</option>
     <script>  
         export default { 
             state:{ 

@@ -30,13 +30,6 @@
             onBeforeUpdate(props,state){
                 this.state.elementTemplates = props.elementTemplates || this.state.elementTemplates;
                 this.state.elementChildren = props.elementChildren || this.state.elementChildren;
-            },
-            onUnmount(props,state){
-                if(this.state.isRoot){
-                    Object.entries(this.state.elementTemplates).forEach((entry,index)=>{
-                        unregister(entry[0]);
-                    });
-                }
             }
         }
     </script>

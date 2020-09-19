@@ -12,7 +12,9 @@
     </div>
   </div>
   <hr style="margin:0;">
-    <main></main>
+  <div each={item in state.surrogate} >
+    <main key={item} is="component-branch"  {...state.proxy}></main>
+  </div>
   <hr>
   <nav id="blockform_editor" class="container" 
         onmouseup={(e)=>resetMoveLayoutItem()} 
@@ -55,11 +57,11 @@
   </style>
   <script>
     const grul = require("grul");
-    import { register,unregister,mount,unmount } from 'riot';
+    import { register,unregister } from 'riot';
     import { compile } from '@riotjs/compiler';
     export default {
         state:{
-            surrogate:0,
+            surrogate:[0],
             name:"",
             proxy:{},
             mode:"form"
@@ -93,9 +95,6 @@
             Object.entries(proxied.elementTemplates).forEach((entry,index)=>{
                 this.registerTemplate(entry[0],entry[1])
             });
-        },
-        onMounted(props){
-            mount(`main`,this.state.proxy,'component-branch');
         },
         addLayoutItem(path,type){
             let max = 0;
@@ -161,13 +160,13 @@
             }
         },
         modifyTemplate(name,template){
+            this.state.surrogate=[];
+            this.update();
             this.state.proxy.elementTemplates[name]=template;
-            unmount(`main`,true);
             unregister(name);
             this.registerTemplate(name,template);
-            mount(`main`,this.state.proxy,'component-branch');
+            this.state.surrogate=[0];
             this.update();
-            
         },
         registerTemplate(name,template){
             let wrappedUncompiled = this.wrapParent(name,template);

@@ -17,7 +17,6 @@
     <ul if={state.elementChildren.length > 0}>
         <li key={element.id+"-menu-branch"} 
             each={ (element,index) in state.elementChildren } 
-            
             style={state.move.target && state.move.target.join("-") === state.path.concat([index]).join("-") ? "opacity:.8" : ""}>
             <button class={state.handlers.modify !== null ? "button" : ""}
                 onclick={()=>toggleProperties(element,index)}>
@@ -28,7 +27,7 @@
                 </button>
                 <span class="add-template-menu" if={state.adding===index} >
                     <select placeholder="select a template" onchange={(e)=>selectTemplate(e.target.value)}>
-                        <option key={entry[0]} each={entry in Object.entries(state.elementTemplates)} value={entry[0]}>{entry[0].replace("blockform_","")}</option>
+                        <option key={entry[0]+"-template-name"} each={entry in Object.entries(state.elementTemplates)} value={entry[0]}>{entry[0].replace("blockform_","")}</option>
                     </select>
                     <button class="button button-outline" onclick={()=>addTemplate(index)}>+</button>
                 </span>

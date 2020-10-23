@@ -12,9 +12,7 @@
     </div>
   </div>
   <hr style="margin:0;">
-  <div each={item in state.surrogate} >
-    <main key={item} is="component-branch"  {...state.proxy}></main>
-  </div>
+    <main is={state.reset?null:"component-branch"} {...state.proxy}></main>
   <hr>
   <nav id="blockform_editor" class="container" 
         onmouseup={(e)=>resetMoveLayoutItem()} 
@@ -23,12 +21,14 @@
     <table>
         <thead>
             <tr>
-                <th style="cursor:pointer;opacity:{state.mode==="block"?"1":".6"};" onclick={()=>changeMode('block')}>block</th>
-                <th style="cursor:pointer;opacity:{state.mode==="form"?"1":".6"};" onclick={()=>changeMode('form')}>form</th>
+                <th style="cursor:pointer;opacity:{state.mode==="block"?"1":".6"};width:87px;max-width:87px;" onclick={()=>changeMode('block')}>block</th>
+                <th style="cursor:pointer;opacity:{state.mode==="form"?"1":".6"};width:87px;max-width:87px;" onclick={()=>changeMode('form')}>form</th>
                 <th>
                     <span style="float:right;">
-                        <input type="text" placeholder="enter form name" style="width:220px;margin:0 auto;margin-right:1em;" onchange={(e)=>updateFormName(e.target.value)} value={state.name}/>
-                        <button class="button" style="margin:0 auto;margin-right:1em;" onclick={exportHTML}>Export HTML</button>
+                        <template if={state.mode==="form"}>
+                            <input type="text" placeholder="enter form name" style="width:220px;margin:0 auto;margin-right:1em;" onchange={(e)=>updateFormName(e.target.value)} value={state.name}/>
+                            <button class="button" style="margin:0 auto;margin-right:1em;" onclick={exportHTML}>Export HTML</button>
+                        </template>
                         <button class="button" style="margin:0 auto;" onclick={exportJSON}>Export JSON</button>
                     </span>
                 </th>
@@ -36,10 +36,10 @@
         </thead>
         <tbody>
             <tr>
-                <td if={state.mode==="block"} style="position:relative;" colspan="3">
+                <td if={state.mode==="block"} style="position:relative;" colspan="8">
                     <component-menu-block {...state.proxy} class="w-100"></component-menu-block>
                 </td>
-                <td if={state.mode==="form"} style="position:relative;" colspan="3">
+                <td if={state.mode==="form"} style="position:relative;" colspan="8">
                     <component-menu-branch {...state.proxy} class="w-100"></component-menu-branch>
                 </td>
             </tr>
@@ -61,10 +61,10 @@
     import { compile } from '@riotjs/compiler';
     export default {
         state:{
-            surrogate:[0],
             name:"",
             proxy:{},
-            mode:"form"
+            mode:"form",
+            reset:false 
         },
         changeMode(name){
             this.state.mode=name;
@@ -86,7 +86,8 @@
                 modify:this.modifyLayoutItem.bind(this),
                 startMove:this.startMoveLayoutItem.bind(this),
                 endMove:this.endMoveLayoutItem.bind(this),
-                modifyTemplate:this.modifyTemplate.bind(this)
+                modifyTemplate:this.modifyTemplate.bind(this),
+                removeTemplate:this.removeTemplate.bind(this)
             };
             this.state.proxy.move = {
                 target:null,
@@ -159,14 +160,36 @@
                 this.resetMoveLayoutItem();
             }
         },
+        unregisterTemplates(){
+            this.state.reset=true;
+            Object.keys(this.state.proxy.elementTemplates,(name)=>{
+                unregister(name);
+            });
+        },
         modifyTemplate(name,template){
-            this.state.surrogate=[];
+            this.state.reset=true;
             this.update();
+            if(name in this.state.proxy.elementTemplates){
+                unregister(name);
+            }
             this.state.proxy.elementTemplates[name]=template;
-            unregister(name);
             this.registerTemplate(name,template);
-            this.state.surrogate=[0];
+            this.state.reset=false;
             this.update();
+        },
+        removeTemplate(name){
+            this.state.reset=true;
+            this.update();
+            if(name in this.state.proxy.elementTemplates){
+                unregister(name);
+            }
+            this.state.reset=false;
+            this.update();
+        },
+        registerTemplates(elementTemplates){
+            Object.entries(elementTemplates,(template)=>{
+                this.registerTemplate(template[0],template[1]);
+            });
         },
         registerTemplate(name,template){
             let wrappedUncompiled = this.wrapParent(name,template);

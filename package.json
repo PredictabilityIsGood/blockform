@@ -6,7 +6,7 @@
   "dependencies": {
     "@riotjs/hot-reload": "^4.0.1",
     "ace-builds": "^1.4.12",
-    "grul": "^0.2.0",
+    "grul": "^0.3.1",
     "require-from-string": "^2.0.2",
     "riot": "^4.13.2"
   },

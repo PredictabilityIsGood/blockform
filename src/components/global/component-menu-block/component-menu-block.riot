@@ -1,8 +1,8 @@
 <component-menu-block>
-    <div class="container" class="w-100">
+    <div class="container" class="w-100" style="padding:0 !important;">
         <div class="row">
             <div class="column">
-                <button class="button button-clear">
+                <button class="button button-clear" style="padding-left:0;">
                     Add
                 </button>
                 <button class="button button-clear">
@@ -44,7 +44,7 @@
             </div>
         </div>
         <div class="row">
-            <div class="column">
+            <div class="column column-75">
                 <label for="editor">Module Code <span 
                                                     if={state.elementTemplates[state.template].HTML !== state.newElementTemplates[state.template].HTML} 
                                                     style="color:firebrick;">*
@@ -52,11 +52,25 @@
                 </label>
                 <div id="editor"></div>
             </div>
+            <div class="column column-25">
+                <label for="editor">Module Defaults <span 
+                                            if={ JSON.stringify(state.elementTemplates[state.template].defaults) !== JSON.stringify(state.newElementTemplates[state.template].defaults)} 
+                                            style="color:firebrick;">*
+                                        </span>
+                </label>
+                <div style="position:relative;height:400px">
+                    <component-properties style="left:-21px;border:1px solid lightgray;"
+                        handlers={state.handlers}
+                        path={["defaults"]}
+                        data={state.defaults}></component-properties>
+                </div>
+            </div>
         </div>
     </div>
     <style>
         #editor{
             height:400px;
+            border:1px solid lightgray;
         }
     </style>
     <script>
@@ -69,13 +83,21 @@
                 newElementTemplates:{},
                 editor:null,
                 handlers:{
-                    modifyTemplate:null
-                }
+                    modifyTemplate:null,
+                    modify:null,
+                },
+                defaults:{}
             },
             onBeforeMount(props,state){
                 this.state.elementTemplates = props.elementTemplates || this.state.elementTemplates;
                 this.state.newElementTemplates = JSON.parse(JSON.stringify(props.elementTemplates)) || this.state.newElementTemplates;
+                this.state.defaults = {
+                    id:-1,
+                    template:this.state.template,
+                    properties:state.newElementTemplates[this.state.template].defaults
+                };
                 this.state.handlers.modifyTemplate = props.handlers && props.handlers.modifyTemplate  ? props.handlers.modifyTemplate : this.state.handlers.modifyTemplate; 
+                this.state.handlers.modify =  (path,properties)=>{ this.setTemplateValue(path[0],properties) }
             },
             onMounted(props,state){
                 ace.config.set("basePath","https://ajaxorg.github.io/ace-builds/src-min-noconflict/")
@@ -86,7 +108,7 @@
                     enableSnippets: true,
                     enableLiveAutocompletion: true
                 });
-                editor.setTheme("ace/theme/tomorrow_night");
+                editor.setTheme("ace/theme/chrome");
                 editor.session.setMode("ace/mode/html");
                 this.state.editor = editor;
                 this.state.editor.setValue(this.state.newElementTemplates[this.state.template].HTML);
@@ -98,6 +120,11 @@
             onBeforeUpdate(props,state){
                 this.state.elementTemplates = props.elementTemplates || this.state.elementTemplates;
                 this.state.editor.setValue(this.state.newElementTemplates[this.state.template].HTML);
+                this.state.defaults = {
+                    id:-1,
+                    template:this.state.template,
+                    properties:state.newElementTemplates[this.state.template].defaults
+                };
             },
             setTemplate(template){
                 this.state.template=template;
@@ -105,6 +132,7 @@
             },
             setTemplateValue(key,value){
                 this.state.newElementTemplates[this.state.template][key]=value;
+                this.update();
             },
             modifyTemplate(){
                 this.state.handlers.modifyTemplate(this.state.template,this.state.newElementTemplates[this.state.template]);

@@ -3,8 +3,8 @@
         <div class="column">
             <div class="row">
                 <h5 class="panel-header w-100">
-                    <span>{state.template.replace("blockform_","")} #{state.id}</span>
-                    <button 
+                    <span>{state.template.replace("blockform_","")} {state.id===-1?"":"#"+state.id}</span>
+                    <button if={state.id!==-1}
                         class="button button-clear float-right" 
                         onclick={()=>state.handlers.modify(state.path,{...state.fields,show:false})}>x</button>
                 </h5>
@@ -45,13 +45,15 @@
     }
     </style>
     <script>
+    
+    const grul = require("grul");
     export default  {
         state:{
             id:-1,
             template:"Test",
-            fields:{
-                test:"property"
-            },
+            properties:{},
+            fieldsPath:{},
+            fields:{},
             handlers:{
                 modify:null
             },
@@ -60,9 +62,32 @@
         onBeforeMount(props,state){
             this.state.id = props.data && props.data.id;
             this.state.template = props.data && props.data.template;
-            this.state.fields = props.data && props.data.properties ? {
+            this.state.properties = props.data && props.data.properties ? {
                 ...props.data.properties
             } : this.state.fields;
+            this.state.fieldsPath = {};
+            this.state.fields = {};
+            grul.atEnds(this.state.properties,(value,htp,hlp)=>{ 
+                this.state.fieldsPath[hlp.join(" => ")] = hlp;
+                this.state.fields[hlp.join(" => ")] = value;
+            });
+            this.state.path = props.path ? props.path : this.state.path;
+            this.state.handlers.modify = props.handlers && props.handlers.modify ?
+                props.handlers.modify :
+                this.state.handlers.modify;
+        },
+        onBeforeUpdate(props,state){
+            this.state.id = props.data && props.data.id;
+            this.state.template = props.data && props.data.template;
+            this.state.properties = props.data && props.data.properties ? {
+                ...props.data.properties
+            } : this.state.fields;
+            this.state.fieldsPath = {};
+            this.state.fields = {};
+            grul.atEnds(this.state.properties,(value,htp,hlp)=>{ 
+                this.state.fieldsPath[hlp.join(" => ")] = hlp;
+                this.state.fields[hlp.join(" => ")] = value;
+            });
             this.state.path = props.path ? props.path : this.state.path;
             this.state.handlers.modify = props.handlers && props.handlers.modify ?
                 props.handlers.modify :
@@ -81,9 +106,10 @@
         },
         modifyProperties(key,value){
             this.state.fields[key] = value;
+            grul.pluck(this.state.properties,this.state.fieldsPath[key],value);
             this.state.handlers.modify(
                 this.state.path,
-                this.state.fields
+                this.state.properties
             )
         }
     }

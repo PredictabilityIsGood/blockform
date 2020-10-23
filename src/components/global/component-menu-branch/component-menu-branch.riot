@@ -2,8 +2,8 @@
     <ul if={state.path.length===0}>
         <li>
             <div class="add-template-wrapper">
-                <button if={state.handlers.add !== null} class="button button-clear add-template-button" onclick={()=>toggleAdd(-1)}>
-                    add to root
+                <button if={state.handlers.add !== null} class="button button-clear add-template-button" style="padding-left:0 !important;" onclick={()=>toggleAdd(-1)}>
+                    add
                 </button>
                 <span class="add-template-menu" if={state.adding===-1} >
                     <select placeholder="select a template" onchange={(e)=>selectTemplate(e.target.value)}>
